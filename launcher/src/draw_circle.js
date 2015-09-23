@@ -1,123 +1,4 @@
-var guodong;
-(function (d) {
-    var f = function (d) {
-        function c(b, a) {
-            d.call(this, b);
-            this.CLASS_NAME = "CustomEvent";
-            this.data = a
-        }
-        __extends(c, d);
-        c.prototype.toString = function () {
-            console.log(this.CLASS_NAME)
-        };
-        return c
-    }(egret.Event);
-    d.CustomEvent = f;
-    f.prototype.__class__ = "guodong.CustomEvent"
-})(guodong || (guodong = {}));
-var GameEvent = function (d) {
-    function f(e, c, b) {
-        void 0 === c && (c = !1);
-        void 0 === b && (b = !1);
-        d.call(this, e, c, b)
-    }
-    __extends(f, d);
-    f.POPUP_BTN_CLICK = "POPUP_BTN_CLICK";
-    f.SHOW_HIDE_TIPS = "SHOW_HIDE_TIPS";
-    f.GAME_START = "GAME_START";
-    return f
-}(egret.Event);
-GameEvent.prototype.__class__ = "GameEvent";
-var GameVO = function () {
-    function d() {}
-    d.GAME_SCORE = 0;
-    return d
-}();
-GameVO.prototype.__class__ = "GameVO";
-(function (d) {
-    var f = function (e) {
-        function c() {
-            e.call(this);
-            this.CLASS_NAME = "CustomEventDispatcher"
-        }
-        __extends(c, e);
-        var b = c.prototype;
-        c.getInstance = function () {
-            void 0 == c._instance && (c._instance = new c);
-            return c._instance
-        };
-        b.dispatch = function (a, b) {
-            this.dispatchEvent(new d.CustomEvent(a, b))
-        };
-        b.toString = function () {
-            console.log(this.CLASS_NAME)
-        };
-        return c
-    }(egret.EventDispatcher);
-    d.CustomEventDispatcher = f;
-    f.prototype.__class__ = "guodong.CustomEventDispatcher"
-})(guodong || (guodong = {}));
-(function (d) {
-    var f = function () {
-        function d() {}
-        d.hitTest = function (c, b) {
-            var a = c.getBounds(),
-                d = b.getBounds();
-            a.x = c.x;
-            a.y = c.y;
-            d.x = b.x;
-            d.y = b.y;
-            return a.intersects(d)
-        };
-        d.getEmptyTouchSprite = function (c, b) {
-            var a = new egret.Sprite;
-            a.graphics.beginFill(16777215, 0);
-            a.graphics.drawRect(0, 0, c, b);
-            a.graphics.endFill();
-            a.width = c;
-            a.height = b;
-            a.touchEnabled = !0;
-            return a
-        };
-        d.getColorSprite = function (c, b, a, d) {
-            void 0 === a && (a = 0);
-            void 0 === d && (d = 1);
-            var e = new egret.Sprite;
-            e.graphics.beginFill(a, d);
-            e.graphics.drawRect(0, 0, c, b);
-            e.graphics.endFill();
-            e.width = c;
-            e.height = b;
-            return e
-        };
-        return d
-    }();
-    d.DisplayObjectUtil = f;
-    f.prototype.__class__ = "guodong.DisplayObjectUtil"
-})(guodong || (guodong = {}));
-(function (d) {
-    var f = function () {
-        function d() {}
-        d.createBitmapByName = function (c) {
-            var b = new egret.Bitmap;
-            c = RES.getRes(c);
-            b.texture = c;
-            return b
-        };
-        d.getTextureByName = function (c) {
-            return RES.getRes(c)
-        };
-        d.destroyRes = function (c) {
-            return RES.destroyRes(c)
-        };
-        d.getTextureFromSheetByName = function (c, b) {
-            return RES.getRes(c).getTexture(b)
-        };
-        return d
-    }();
-    d.ResUtil = f;
-    f.prototype.__class__ = "guodong.ResUtil"
-})(guodong || (guodong = {}));
+//绘制区域
 var DrawLayer = function (d) {
     function f() {
         d.call(this);
@@ -135,7 +16,7 @@ var DrawLayer = function (d) {
         this.addChild(this._myShape);
         this.touchChildren = !1;
         this.touchEnabled = !0;
-        c = guodong.DisplayObjectUtil.getEmptyTouchSprite(640, 1200);
+        c = game.DisplayObjectUtil.getEmptyTouchSprite(640, 1200);
         c.x = -320;
         c.y = -600;
         this.addChild(c)
@@ -194,7 +75,7 @@ var DrawLayer = function (d) {
             this.m_clickDrag.push(!0);
         this._myShape.graphics.moveTo(this._touchPointArr[0].x, this._touchPointArr[0].y);
         this._myShape.graphics.lineTo(this._touchPointArr[this._touchPointArr.length - 1].x, this._touchPointArr[this._touchPointArr.length - 1].y);
-        guodong.CustomEventDispatcher.getInstance().dispatch("draw_end", null)
+        game.CustomEventDispatcher.getInstance().dispatch("draw_end", null)
     };
     Object.defineProperty(e, "positionList", {
         get: function () {
@@ -206,6 +87,7 @@ var DrawLayer = function (d) {
     return f
 }(egret.Sprite);
 DrawLayer.prototype.__class__ = "DrawLayer";
+
 var PopupWindow = function (d) {
     function f() {
         d.call(this);
@@ -235,8 +117,8 @@ var PopupWindow = function (d) {
         this._bgLayout.alpha = 0;
         this._bgLayout.visible = !1;
         this._popupArr = [];
-        this._popupArr.push(new Popup1);
-        this._popupArr.push(new Popup2);
+        this._popupArr.push(new GameOverWindow);
+        this._popupArr.push(new ShareWindow);
         this._openPopupArr = []
     };
     e.showPopupById = function (c) {
@@ -275,7 +157,9 @@ var PopupWindow = function (d) {
     return f
 }(egret.DisplayObjectContainer);
 PopupWindow.prototype.__class__ = "PopupWindow";
-var Popup1 = function (d) {
+
+//每次画圆结束的结算，包含分享和再玩一次
+var GameOverWindow = function (d) {
     function f() {
         d.call(this);
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
@@ -285,14 +169,14 @@ var Popup1 = function (d) {
         this._txt.height = 100;
         this._txt.textAlign = "center";
         this.addChild(this._txt);
-        this._btn1 = guodong.ResUtil.createBitmapByName("replay_btn_png");
+        this._btn1 = game.ResUtil.createBitmapByName("replay_btn_png");
         this._btn1.x = 157;
         this._btn1.y = 720;
         this._btn1.name = "btn1";
         this._btn1.touchEnabled = !0;
         this.addChild(this._btn1);
         this._btn1.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTap, this);
-        this._btn2 = guodong.ResUtil.createBitmapByName("share_btn_png");
+        this._btn2 = game.ResUtil.createBitmapByName("share_btn_png");
         this._btn2.x = 326;
         this._btn2.y = 720;
         this._btn2.name = "btn2";
@@ -311,23 +195,25 @@ var Popup1 = function (d) {
         this._txt.lineSpacing = 10
     };
     e.onTouchTap = function (c) {
-        "btn1" == c.currentTarget.name ? (PopupWindow.getInstance().removePopup(f.POPUP_ID), guodong.CustomEventDispatcher.getInstance().dispatch(GameEvent.POPUP_BTN_CLICK, "game_reply"), this._btn1.touchEnabled = !1) : "btn2" == c.currentTarget.name && PopupWindow.getInstance().showPopupById(Popup2.POPUP_ID)
+        "btn1" == c.currentTarget.name ? (PopupWindow.getInstance().removePopup(f.POPUP_ID), game.CustomEventDispatcher.getInstance().dispatch(GameEvent.POPUP_BTN_CLICK, "game_reply"), this._btn1.touchEnabled = !1) : "btn2" == c.currentTarget.name && PopupWindow.getInstance().showPopupById(ShareWindow.POPUP_ID)
     };
     f.POPUP_ID = 0;
     return f
 }(egret.Sprite);
-Popup1.prototype.__class__ = "Popup1";
-var Popup2 = function (d) {
+GameOverWindow.prototype.__class__ = "GameOverWindow";
+
+//分享提示界面
+var ShareWindow = function (d) {
     function f() {
         d.call(this);
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
-        var c = guodong.DisplayObjectUtil.getColorSprite(640, 1300, 0, 0.6);
+        var c = game.DisplayObjectUtil.getColorSprite(640, 1300, 0, 0.6);
         this.addChild(c);
-        c = guodong.ResUtil.createBitmapByName("share_tips_png");
+        c = game.ResUtil.createBitmapByName("share_tips_png");
         c.x = 190;
         c.y = 60;
         this.addChild(c);
-        this._touchSp = guodong.DisplayObjectUtil.getEmptyTouchSprite(640, 1300);
+        this._touchSp = game.DisplayObjectUtil.getEmptyTouchSprite(640, 1300);
         this.addChild(this._touchSp);
         this._touchSp.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTap, this)
     }
@@ -342,7 +228,8 @@ var Popup2 = function (d) {
     f.POPUP_ID = 1;
     return f
 }(egret.Sprite);
-Popup2.prototype.__class__ = "Popup2";
+ShareWindow.prototype.__class__ = "ShareWindow";
+
 var ArrowBtn = function (d) {
     function f() {
         d.call(this);
@@ -351,7 +238,7 @@ var ArrowBtn = function (d) {
     __extends(f, d);
     var e = f.prototype;
     e.onAddToStage = function (c) {
-        this._arrowIcon = guodong.ResUtil.createBitmapByName("arrow_png");
+        this._arrowIcon = game.ResUtil.createBitmapByName("arrow_png");
         this._arrowIcon.x = -1 * this._arrowIcon.width / 2;
         this.addChild(this._arrowIcon);
         egret.Tween.get(this._arrowIcon, {
@@ -369,6 +256,7 @@ var ArrowBtn = function (d) {
     return f
 }(egret.Sprite);
 ArrowBtn.prototype.__class__ = "ArrowBtn";
+
 var Game = function (d) {
     function f() {
         d.call(this);
@@ -387,15 +275,15 @@ var Game = function (d) {
         this.addChild(this._bgLayout);
         this.addChild(this._gameLayout);
         this.addChild(this._uiLayout);
-        c = guodong.ResUtil.createBitmapByName("page3_txt_png");
+        c = game.ResUtil.createBitmapByName("page3_txt_png");
         c.x = 250;
         c.y = 87;
         this._bgLayout.addChild(c);
-        this._gameInfo = guodong.ResUtil.createBitmapByName("game_info_png");
+        this._gameInfo = game.ResUtil.createBitmapByName("game_info_png");
         this._gameInfo.x = 217;
         this._gameInfo.y = 277;
         this._uiLayout.addChild(this._gameInfo);
-        this._gameStartBtn = guodong.ResUtil.createBitmapByName("game_btn_png");
+        this._gameStartBtn = game.ResUtil.createBitmapByName("game_btn_png");
         this._gameStartBtn.x = 264;
         this._gameStartBtn.y = 675;
         this._uiLayout.addChild(this._gameStartBtn);
@@ -433,8 +321,8 @@ var Game = function (d) {
         this._checkIndex = 0;
         this._checkNumArr = [];
         this._gameLayout.visible = !1;
-        guodong.CustomEventDispatcher.getInstance().addEventListener("draw_end", this.drawEndHandler, this);
-        guodong.CustomEventDispatcher.getInstance().addEventListener(GameEvent.POPUP_BTN_CLICK, this.popupClickHandler, this);
+        game.CustomEventDispatcher.getInstance().addEventListener("draw_end", this.drawEndHandler, this);
+        game.CustomEventDispatcher.getInstance().addEventListener(GameEvent.POPUP_BTN_CLICK, this.popupClickHandler, this);
         AppConfig.playMusci()
     };
     e.gameStart = function () {
@@ -444,7 +332,7 @@ var Game = function (d) {
         }, 500)
     };
     e.gameOver = function () {
-        PopupWindow.getInstance().showPopupById(Popup1.POPUP_ID)
+        PopupWindow.getInstance().showPopupById(GameOverWindow.POPUP_ID)
     };
     e.gameReplay = function () {
         this._checkIndex = 0;
@@ -516,6 +404,7 @@ var Game = function (d) {
     return f
 }(egret.DisplayObjectContainer);
 Game.prototype.__class__ = "Game";
+
 var LoadingUI = function (d) {
     function f() {
         d.call(this);
@@ -537,6 +426,7 @@ var LoadingUI = function (d) {
     return f
 }(egret.Sprite);
 LoadingUI.prototype.__class__ = "LoadingUI";
+
 var Page1 = function (d) {
     function f() {
         d.call(this);
@@ -552,13 +442,13 @@ var Page1 = function (d) {
         this.addChild(this._bgLayout);
         this.addChild(this._gameLayout);
         this.addChild(this._uiLayout);
-        c = guodong.ResUtil.createBitmapByName("bg_jpg");
+        c = game.ResUtil.createBitmapByName("bg_jpg");
         this._bgLayout.addChild(c);
-        this._shine = guodong.ResUtil.createBitmapByName("page1_logo_shine_png");
+        this._shine = game.ResUtil.createBitmapByName("page1_logo_shine_png");
         this._shine.x = 143;
         this._shine.y = 580;
         this.addChild(this._shine);
-        c = guodong.ResUtil.createBitmapByName("page1_logo_png");
+        c = game.ResUtil.createBitmapByName("page1_logo_png");
         c.x = 140;
         c.y = 376;
         this._bgLayout.addChild(c);
@@ -576,6 +466,7 @@ var Page1 = function (d) {
     return f
 }(egret.DisplayObjectContainer);
 Page1.prototype.__class__ = "Page1";
+
 var Page2 = function (d) {
     function f() {
         d.call(this);
@@ -593,22 +484,22 @@ var Page2 = function (d) {
         this.addChild(this._bgLayout);
         this.addChild(this._gameLayout);
         this.addChild(this._uiLayout);
-        d = guodong.ResUtil.createBitmapByName("bg2_jpg");
+        d = game.ResUtil.createBitmapByName("bg2_jpg");
         d.y = -450;
         this._bgLayout.addChild(d);
-        var c = guodong.ResUtil.createBitmapByName("page2_txt1_png");
+        var c = game.ResUtil.createBitmapByName("page2_txt1_png");
         c.x = 225;
         c.y = 114;
         this._gameLayout.addChild(c);
-        var b = guodong.ResUtil.createBitmapByName("page2_txt2_png");
+        var b = game.ResUtil.createBitmapByName("page2_txt2_png");
         b.x = 125;
         b.y = 207;
         this._gameLayout.addChild(b);
-        var a = guodong.ResUtil.createBitmapByName("page2_txt3_png");
+        var a = game.ResUtil.createBitmapByName("page2_txt3_png");
         a.x = 70;
         a.y = 28;
         this._gameLayout.addChild(a);
-        var f = guodong.ResUtil.createBitmapByName("page2_man_png");
+        var f = game.ResUtil.createBitmapByName("page2_man_png");
         f.x = 0;
         f.y = 190;
         this._gameLayout.addChild(f);
@@ -631,6 +522,7 @@ var Page2 = function (d) {
     return f
 }(egret.DisplayObjectContainer);
 Page2.prototype.__class__ = "Page2";
+
 var Page3 = function (d) {
     function f() {
         d.call(this);
@@ -651,24 +543,24 @@ var Page3 = function (d) {
         this.addChild(this._bgLayout);
         this.addChild(this._gameLayout);
         this.addChild(this._uiLayout);
-        c = guodong.ResUtil.createBitmapByName("bg_jpg");
+        c = game.ResUtil.createBitmapByName("bg_jpg");
         this._bgLayout.addChild(c);
-        c = guodong.ResUtil.createBitmapByName("page3_txt_png");
+        c = game.ResUtil.createBitmapByName("page3_txt_png");
         c.x = 227;
         c.y = 87;
         this._gameLayout.addChild(c);
-        c = guodong.ResUtil.createBitmapByName("page4_line_png");
+        c = game.ResUtil.createBitmapByName("page4_line_png");
         c.y = 155;
         this._gameLayout.addChild(c);
-        this._pic = guodong.ResUtil.createBitmapByName("page4_pic_png");
+        this._pic = game.ResUtil.createBitmapByName("page4_pic_png");
         this._pic.x = -250;
         this._pic.y = 157;
         this._gameLayout.addChild(this._pic);
-        c = guodong.ResUtil.createBitmapByName("page4_txt1_png");
+        c = game.ResUtil.createBitmapByName("page4_txt1_png");
         c.x = 140;
         c.y = 230;
         this._gameLayout.addChild(c);
-        c = guodong.ResUtil.createBitmapByName("page4_txt2_png");
+        c = game.ResUtil.createBitmapByName("page4_txt2_png");
         c.x = 60;
         c.y = 650;
         this._gameLayout.addChild(c);
@@ -690,6 +582,7 @@ var Page3 = function (d) {
     return f
 }(egret.DisplayObjectContainer);
 Page3.prototype.__class__ = "Page3";
+
 var Page4 = function (d) {
     function f() {
         d.call(this);
@@ -707,21 +600,21 @@ var Page4 = function (d) {
         this.addChild(this._bgLayout);
         this.addChild(this._gameLayout);
         this.addChild(this._uiLayout);
-        d = guodong.ResUtil.createBitmapByName("bg");
+        d = game.ResUtil.createBitmapByName("bg");
         this._bgLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page3_txt_png");
+        d = game.ResUtil.createBitmapByName("page3_txt_png");
         d.x = 227;
         d.y = 87;
         this._gameLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page5_txt2_png");
+        d = game.ResUtil.createBitmapByName("page5_txt2_png");
         d.x = 125;
         d.y = 155;
         this._gameLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page5_pic_png");
+        d = game.ResUtil.createBitmapByName("page5_pic_png");
         d.x = 100;
         d.y = 305;
         this._gameLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page6_txt1_png");
+        d = game.ResUtil.createBitmapByName("page6_txt1_png");
         d.x = 217;
         d.y = 790;
         this.addChild(d)
@@ -729,6 +622,7 @@ var Page4 = function (d) {
     return f
 }(egret.DisplayObjectContainer);
 Page4.prototype.__class__ = "Page4";
+
 var Page5 = function (d) {
     function f() {
         d.call(this);
@@ -746,21 +640,21 @@ var Page5 = function (d) {
         this.addChild(this._bgLayout);
         this.addChild(this._gameLayout);
         this.addChild(this._uiLayout);
-        d = guodong.ResUtil.createBitmapByName("bg");
+        d = game.ResUtil.createBitmapByName("bg");
         this._bgLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page3_txt_png");
+        d = game.ResUtil.createBitmapByName("page3_txt_png");
         d.x = 227;
         d.y = 87;
         this._gameLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page5_txt2_png");
+        d = game.ResUtil.createBitmapByName("page5_txt2_png");
         d.x = 125;
         d.y = 155;
         this._gameLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("pic6_pic_png");
+        d = game.ResUtil.createBitmapByName("pic6_pic_png");
         d.x = 100;
         d.y = 305;
         this._gameLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page7_txt1_png");
+        d = game.ResUtil.createBitmapByName("page7_txt1_png");
         d.x = 232;
         d.y = 790;
         this.addChild(d)
@@ -768,6 +662,7 @@ var Page5 = function (d) {
     return f
 }(egret.DisplayObjectContainer);
 Page5.prototype.__class__ = "Page5";
+
 var Page6 = function (d) {
     function f() {
         d.call(this);
@@ -785,13 +680,13 @@ var Page6 = function (d) {
         this.addChild(this._bgLayout);
         this.addChild(this._gameLayout);
         this.addChild(this._uiLayout);
-        d = guodong.ResUtil.createBitmapByName("bg3_jpg");
+        d = game.ResUtil.createBitmapByName("bg3_jpg");
         this._bgLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page2_txt1_png");
+        d = game.ResUtil.createBitmapByName("page2_txt1_png");
         d.x = 225;
         d.y = 114;
         this._bgLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page33_png");
+        d = game.ResUtil.createBitmapByName("page33_png");
         d.x = 81;
         d.y = 465;
         this._bgLayout.addChild(d);
@@ -802,6 +697,7 @@ var Page6 = function (d) {
     return f
 }(egret.DisplayObjectContainer);
 Page6.prototype.__class__ = "Page6";
+
 var Page7 = function (d) {
     function f() {
         d.call(this);
@@ -819,17 +715,17 @@ var Page7 = function (d) {
         this.addChild(this._bgLayout);
         this.addChild(this._gameLayout);
         this.addChild(this._uiLayout);
-        d = guodong.ResUtil.createBitmapByName("bg_jpg");
+        d = game.ResUtil.createBitmapByName("bg_jpg");
         this._bgLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page333_png");
+        d = game.ResUtil.createBitmapByName("page333_png");
         d.x = 115;
         d.y = 87;
         this._gameLayout.addChild(d);
-        d = guodong.ResUtil.createBitmapByName("page3_pic2_png");
+        d = game.ResUtil.createBitmapByName("page3_pic2_png");
         d.x = 116;
         d.y = 240;
         this._gameLayout.addChild(d);
-        var c = guodong.ResUtil.createBitmapByName("page3_txt2_png");
+        var c = game.ResUtil.createBitmapByName("page3_txt2_png");
         c.x = 120;
         c.y = 510;
         this._gameLayout.addChild(c);
@@ -845,6 +741,7 @@ var Page7 = function (d) {
     return f
 }(egret.DisplayObjectContainer);
 Page7.prototype.__class__ = "Page7";
+
 var Main = function (d) {
     function f() {
         d.call(this);
@@ -883,9 +780,9 @@ var Main = function (d) {
         this.addChild(this._bgLayout);
         this.addChild(this._gameLayout);
         this.addChild(this._uiLayout);
-        this._bgLayout.addChild(guodong.ResUtil.createBitmapByName("bg_jpg"));
+        this._bgLayout.addChild(game.ResUtil.createBitmapByName("bg_jpg"));
         this._uiLayout.addChild(PopupWindow.getInstance());
-        this._touchSp = guodong.DisplayObjectUtil.getEmptyTouchSprite(640, 1200);
+        this._touchSp = game.DisplayObjectUtil.getEmptyTouchSprite(640, 1200);
         //this._uiLayout.addChild(this._touchSp);
         this._touchSp.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchHandler, this);
         this._touchSp.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchHandler, this);
