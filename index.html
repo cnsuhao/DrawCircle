@@ -1,0 +1,145 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>画个圆吧</title>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no,target-densitydpi=device-dpi"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+
+    <meta name="full-screen" content="true"/>
+    <meta name="screen-orientation" content="portrait"/>
+    <meta name="x5-fullscreen" content="true"/>
+    <meta name="360-fullscreen" content="true"/>
+    <script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-65574352-1', 'auto');
+	  ga('send', 'pageview');
+
+	</script>
+    <script src="launcher/jquery-1.7.2.min.js"></script>
+    <!--接入微信SDK的js文件-->
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script>
+        //接入SDK的php文件,目前没有
+        //document.write("<script src='jssdk.php?url="+escape(window.location.href)+"&v=1.0'><\/script>");
+    </script>
+    <style>
+        body {
+            text-align: center;
+            background: #000000;
+            padding: 0;
+            border: 0;
+            margin: 0;
+            height: 100%;
+        }
+        html {
+            -ms-touch-action: none; /* Direct all pointer events to JavaScript code. */
+            overflow: hidden;
+        }
+        div, canvas {
+            display:block;
+            position:absolute;
+            margin: 0 auto;
+            padding: 0;
+            border: 0;
+        }
+        .videoplayer{
+            /*background: url(launcher/videobg.png);*/
+            width: 468px;
+            height: 263px;
+            z-index: 99;
+            position: absolute;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<!--<audio id="bgaudio" src="http://7xisna.com1.z0.glb.clouddn.com/bvlgari_music.mp3"></audio>
+<div class="videoplayer">
+    <video width="468" height="263" controls poster="launcher/videobg.png" class="video">
+        <source src="http://events.youku.com/2015/bvlgari/nongqing.mp4" type="video/mp4" />
+    </video>
+</div>-->
+<div style="position:relative;" id="gameDiv"></div>
+<script>var document_class = "Main";</script>
+<script src="launcher/egret_require.js"></script>
+<script src="launcher/egret_loader.js"></script>
+<script src="launcher/egret-min.js"></script>
+<script src="launcher/draw_circle.js"></script>
+<script>
+    var AppConfig = {
+        setShareInfo:function(score){
+            var s = score.toString();
+            var str = s.substring(0,s.indexOf(".") + 3);
+            //share1.title = "我刚刚画了一个"+ str +"分的O，你也是我的有O人么？";
+        },
+        showDiv:function(type){
+            if(type == 1)
+            {
+                //$(".videoplayer").show();
+            }
+            else
+            {
+                //$(".videoplayer").hide();
+                //$('.video').trigger('pause');
+            }
+        },
+        //背景音乐
+        playMusci:function(){
+            //document.getElementById('bgaudio').play();
+        },
+        tracking:function(code){
+            if(code != "game") {
+                //console.log("page",code);
+                ga('send', 'event', 'page', 'view', code);
+            }else{
+                //console.log("game",code);
+                ga('send', 'event', 'button', 'click', '开始游戏');
+            }
+        }
+    }
+    var support = [].map && document.createElement("canvas").getContext;
+    if (support) {
+        egret_h5.startGame();
+    }
+    else {
+        alert("HTML5不支持您当前的浏览器")
+    }
+</script>
+<script>
+	function $(p)
+    {
+		return document.getElementById(p);
+	}
+    //视频音乐
+    $(function()
+    {
+        console.log($(window).width(), $(window).height());
+
+        var rw=$(window).width();
+        var rh=$(window).height();
+        var r=rw/640;
+        var r2 = rh/1039;
+        $(".videoplayer").css({"transform":"scale("+r+","+r+")","-webkit-transform":"scale("+r+","+r+")"});
+
+        var left = (rw-468)/2;
+        var top = (rh-263)/2 - 200*r;
+        $(".videoplayer").css("left" , left +"px");
+        $(".videoplayer").css("top" , top+"px");
+
+
+        $('.video').on("play",function(){
+            document.getElementById('bgaudio').pause();
+        });
+        document.getElementById('bgaudio').play();
+
+    });
+</script>
+</body>
+</html>
