@@ -7,7 +7,7 @@ var DrawLayer = function (d) {
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
         this.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchBegin, this);
         this.addEventListener(egret.TouchEvent.TOUCH_MOVE, this.onTouchMoved, this);
-        this.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnded, this)
+        this.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchEnded, this);
     }
     __extends(f, d);
     var e = f.prototype;
@@ -37,7 +37,10 @@ var DrawLayer = function (d) {
     e.redraw = function () {
         this._myShape.graphics.clear();
         this._myShape.graphics.lineStyle(3, 15382354, 1, !0, "", "", "round");
-        for (var c = 0; c < this._touchPointArr.length; c++) this.m_clickDrag[c] && c ? this._myShape.graphics.moveTo(this._touchPointArr[c - 1].x, this._touchPointArr[c - 1].y) : this._myShape.graphics.moveTo(this._touchPointArr[c].x - 1, this._touchPointArr[c].y),
+        for (var c = 0; c < this._touchPointArr.length; c++)
+            this.m_clickDrag[c] && c ?
+            this._myShape.graphics.moveTo(this._touchPointArr[c - 1].x, this._touchPointArr[c - 1].y) :
+            this._myShape.graphics.moveTo(this._touchPointArr[c].x - 1, this._touchPointArr[c].y),
             this._myShape.graphics.lineTo(this._touchPointArr[c].x, this._touchPointArr[c].y);
         this._myShape.graphics.endFill()
     };
@@ -190,12 +193,17 @@ var GameOverWindow = function (d) {
         this._btn1.touchEnabled = this._btn2.touchEnabled = !0;
         c = GameVO.GAME_SCORE.toString();
         c = c.substring(0, c.indexOf(".") + 3);
-        this._txt.text = "\u4f60\u753b\u4e86\u4e00\u4e2a" + c + "\u5206\u7684O\n\u7acb\u523b\u5206\u4eab\u4e00\u4e0b\u670b\u53cb\u5708\n\u627e\u5230\u4e0e\u4f60\u4e00\u6837\u7684\u6709O\u4eba!";
+        this._txt.text = "你画了一个" + c + "分的O\n立刻分享一下朋友圈\n找到与你一样的有O人！";
         this._txt.bold = !0;
         this._txt.lineSpacing = 10
     };
+    //是否分享，继续玩
     e.onTouchTap = function (c) {
-        "btn1" == c.currentTarget.name ? (PopupWindow.getInstance().removePopup(f.POPUP_ID), game.CustomEventDispatcher.getInstance().dispatch(GameEvent.POPUP_BTN_CLICK, "game_reply"), this._btn1.touchEnabled = !1) : "btn2" == c.currentTarget.name && PopupWindow.getInstance().showPopupById(ShareWindow.POPUP_ID)
+        "btn1" == c.currentTarget.name ?
+            (PopupWindow.getInstance().removePopup(f.POPUP_ID),
+             game.CustomEventDispatcher.getInstance().dispatch(GameEvent.POPUP_BTN_CLICK, "game_reply"),
+             this._btn1.touchEnabled = !1) :
+             "btn2" == c.currentTarget.name && PopupWindow.getInstance().showPopupById(ShareWindow.POPUP_ID)
     };
     f.POPUP_ID = 0;
     return f
@@ -230,33 +238,7 @@ var ShareWindow = function (d) {
 }(egret.Sprite);
 ShareWindow.prototype.__class__ = "ShareWindow";
 
-var ArrowBtn = function (d) {
-    function f() {
-        d.call(this);
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this)
-    }
-    __extends(f, d);
-    var e = f.prototype;
-    e.onAddToStage = function (c) {
-        this._arrowIcon = game.ResUtil.createBitmapByName("arrow_png");
-        this._arrowIcon.x = -1 * this._arrowIcon.width / 2;
-        this.addChild(this._arrowIcon);
-        egret.Tween.get(this._arrowIcon, {
-            loop: !0
-        }).to({
-            y: 10,
-            alpha: 0
-        }, 800).wait(200)
-    };
-    e.destroy = function () {
-        egret.Tween.removeTweens(this._arrowIcon);
-        this.removeChild(this._arrowIcon);
-        this.parent.removeChild(this)
-    };
-    return f
-}(egret.Sprite);
-ArrowBtn.prototype.__class__ = "ArrowBtn";
-
+//游戏核心
 var Game = function (d) {
     function f() {
         d.call(this);
@@ -405,6 +387,7 @@ var Game = function (d) {
 }(egret.DisplayObjectContainer);
 Game.prototype.__class__ = "Game";
 
+//进度条
 var LoadingUI = function (d) {
     function f() {
         d.call(this);
@@ -427,321 +410,7 @@ var LoadingUI = function (d) {
 }(egret.Sprite);
 LoadingUI.prototype.__class__ = "LoadingUI";
 
-var Page1 = function (d) {
-    function f() {
-        d.call(this);
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
-        this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveStage, this)
-    }
-    __extends(f, d);
-    var e = f.prototype;
-    e.onAddToStage = function (c) {
-        this._bgLayout = new egret.DisplayObjectContainer;
-        this._uiLayout = new egret.DisplayObjectContainer;
-        this._gameLayout = new egret.DisplayObjectContainer;
-        this.addChild(this._bgLayout);
-        this.addChild(this._gameLayout);
-        this.addChild(this._uiLayout);
-        c = game.ResUtil.createBitmapByName("bg_jpg");
-        this._bgLayout.addChild(c);
-        this._shine = game.ResUtil.createBitmapByName("page1_logo_shine_png");
-        this._shine.x = 143;
-        this._shine.y = 580;
-        this.addChild(this._shine);
-        c = game.ResUtil.createBitmapByName("page1_logo_png");
-        c.x = 140;
-        c.y = 376;
-        this._bgLayout.addChild(c);
-        egret.Tween.get(this._shine, {
-            loop: !0
-        }).to({
-            alpha: 0
-        }, 1E3).to({
-            alpha: 1
-        }, 1E3)
-    };
-    e.onRemoveStage = function (c) {
-        egret.Tween.removeTweens(this._shine)
-    };
-    return f
-}(egret.DisplayObjectContainer);
-Page1.prototype.__class__ = "Page1";
-
-var Page2 = function (d) {
-    function f() {
-        d.call(this);
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this)
-    }
-    __extends(f, d);
-    f.prototype.onAddToStage = function (d) {
-        this.alpha = 0;
-        egret.Tween.get(this).to({
-            alpha: 1
-        }, 500);
-        this._bgLayout = new egret.DisplayObjectContainer;
-        this._uiLayout = new egret.DisplayObjectContainer;
-        this._gameLayout = new egret.DisplayObjectContainer;
-        this.addChild(this._bgLayout);
-        this.addChild(this._gameLayout);
-        this.addChild(this._uiLayout);
-        d = game.ResUtil.createBitmapByName("bg2_jpg");
-        d.y = -450;
-        this._bgLayout.addChild(d);
-        var c = game.ResUtil.createBitmapByName("page2_txt1_png");
-        c.x = 225;
-        c.y = 114;
-        this._gameLayout.addChild(c);
-        var b = game.ResUtil.createBitmapByName("page2_txt2_png");
-        b.x = 125;
-        b.y = 207;
-        this._gameLayout.addChild(b);
-        var a = game.ResUtil.createBitmapByName("page2_txt3_png");
-        a.x = 70;
-        a.y = 28;
-        this._gameLayout.addChild(a);
-        var f = game.ResUtil.createBitmapByName("page2_man_png");
-        f.x = 0;
-        f.y = 190;
-        this._gameLayout.addChild(f);
-        c.alpha = 0;
-        b.alpha = 0;
-        a.alpha = 0;
-        egret.Tween.get(c).wait(1200).to({
-            alpha: 1
-        }, 800);
-        egret.Tween.get(b).wait(1800).to({
-            alpha: 1
-        }, 800);
-        egret.Tween.get(a).wait(2E3).to({
-            alpha: 1
-        }, 800);
-        egret.Tween.get(d).wait(800).to({
-            y: 0
-        }, 8E3)
-    };
-    return f
-}(egret.DisplayObjectContainer);
-Page2.prototype.__class__ = "Page2";
-
-var Page3 = function (d) {
-    function f() {
-        d.call(this);
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
-        this.addEventListener(egret.Event.REMOVED_FROM_STAGE, this.onRemoveStage, this)
-    }
-    __extends(f, d);
-    var e = f.prototype;
-    e.onAddToStage = function (c) {
-        var b = this;
-        this.alpha = 0;
-        egret.Tween.get(this).to({
-            alpha: 1
-        }, 500);
-        this._bgLayout = new egret.DisplayObjectContainer;
-        this._uiLayout = new egret.DisplayObjectContainer;
-        this._gameLayout = new egret.DisplayObjectContainer;
-        this.addChild(this._bgLayout);
-        this.addChild(this._gameLayout);
-        this.addChild(this._uiLayout);
-        c = game.ResUtil.createBitmapByName("bg_jpg");
-        this._bgLayout.addChild(c);
-        c = game.ResUtil.createBitmapByName("page3_txt_png");
-        c.x = 227;
-        c.y = 87;
-        this._gameLayout.addChild(c);
-        c = game.ResUtil.createBitmapByName("page4_line_png");
-        c.y = 155;
-        this._gameLayout.addChild(c);
-        this._pic = game.ResUtil.createBitmapByName("page4_pic_png");
-        this._pic.x = -250;
-        this._pic.y = 157;
-        this._gameLayout.addChild(this._pic);
-        c = game.ResUtil.createBitmapByName("page4_txt1_png");
-        c.x = 140;
-        c.y = 230;
-        this._gameLayout.addChild(c);
-        c = game.ResUtil.createBitmapByName("page4_txt2_png");
-        c.x = 60;
-        c.y = 650;
-        this._gameLayout.addChild(c);
-        egret.setTimeout(function (a) {
-            egret.Tween.get(b._pic, {
-                loop: !0
-            }).to({
-                x: 0
-            }, 4E3).wait(1E3).to({
-                x: -450
-            }, 4E3).wait(1E3).to({
-                x: -250
-            }, 1500).wait(1E3)
-        }, this, 1E3)
-    };
-    e.onRemoveStage = function (c) {
-        egret.Tween.removeTweens(this._pic)
-    };
-    return f
-}(egret.DisplayObjectContainer);
-Page3.prototype.__class__ = "Page3";
-
-var Page4 = function (d) {
-    function f() {
-        d.call(this);
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this)
-    }
-    __extends(f, d);
-    f.prototype.onAddToStage = function (d) {
-        this.alpha = 0;
-        egret.Tween.get(this).to({
-            alpha: 1
-        }, 500);
-        this._bgLayout = new egret.DisplayObjectContainer;
-        this._uiLayout = new egret.DisplayObjectContainer;
-        this._gameLayout = new egret.DisplayObjectContainer;
-        this.addChild(this._bgLayout);
-        this.addChild(this._gameLayout);
-        this.addChild(this._uiLayout);
-        d = game.ResUtil.createBitmapByName("bg");
-        this._bgLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page3_txt_png");
-        d.x = 227;
-        d.y = 87;
-        this._gameLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page5_txt2_png");
-        d.x = 125;
-        d.y = 155;
-        this._gameLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page5_pic_png");
-        d.x = 100;
-        d.y = 305;
-        this._gameLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page6_txt1_png");
-        d.x = 217;
-        d.y = 790;
-        this.addChild(d)
-    };
-    return f
-}(egret.DisplayObjectContainer);
-Page4.prototype.__class__ = "Page4";
-
-var Page5 = function (d) {
-    function f() {
-        d.call(this);
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this)
-    }
-    __extends(f, d);
-    f.prototype.onAddToStage = function (d) {
-        this.alpha = 0;
-        egret.Tween.get(this).to({
-            alpha: 1
-        }, 500);
-        this._bgLayout = new egret.DisplayObjectContainer;
-        this._uiLayout = new egret.DisplayObjectContainer;
-        this._gameLayout = new egret.DisplayObjectContainer;
-        this.addChild(this._bgLayout);
-        this.addChild(this._gameLayout);
-        this.addChild(this._uiLayout);
-        d = game.ResUtil.createBitmapByName("bg");
-        this._bgLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page3_txt_png");
-        d.x = 227;
-        d.y = 87;
-        this._gameLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page5_txt2_png");
-        d.x = 125;
-        d.y = 155;
-        this._gameLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("pic6_pic_png");
-        d.x = 100;
-        d.y = 305;
-        this._gameLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page7_txt1_png");
-        d.x = 232;
-        d.y = 790;
-        this.addChild(d)
-    };
-    return f
-}(egret.DisplayObjectContainer);
-Page5.prototype.__class__ = "Page5";
-
-var Page6 = function (d) {
-    function f() {
-        d.call(this);
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this)
-    }
-    __extends(f, d);
-    f.prototype.onAddToStage = function (d) {
-        this.alpha = 0;
-        egret.Tween.get(this).to({
-            alpha: 1
-        }, 500);
-        this._bgLayout = new egret.DisplayObjectContainer;
-        this._uiLayout = new egret.DisplayObjectContainer;
-        this._gameLayout = new egret.DisplayObjectContainer;
-        this.addChild(this._bgLayout);
-        this.addChild(this._gameLayout);
-        this.addChild(this._uiLayout);
-        d = game.ResUtil.createBitmapByName("bg3_jpg");
-        this._bgLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page2_txt1_png");
-        d.x = 225;
-        d.y = 114;
-        this._bgLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page33_png");
-        d.x = 81;
-        d.y = 465;
-        this._bgLayout.addChild(d);
-        egret.Tween.get(this).wait(600).call(function (c) {
-            AppConfig.showDiv(1)
-        }, this)
-    };
-    return f
-}(egret.DisplayObjectContainer);
-Page6.prototype.__class__ = "Page6";
-
-var Page7 = function (d) {
-    function f() {
-        d.call(this);
-        this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this)
-    }
-    __extends(f, d);
-    f.prototype.onAddToStage = function (d) {
-        this.alpha = 0;
-        egret.Tween.get(this).to({
-            alpha: 1
-        }, 500);
-        this._bgLayout = new egret.DisplayObjectContainer;
-        this._uiLayout = new egret.DisplayObjectContainer;
-        this._gameLayout = new egret.DisplayObjectContainer;
-        this.addChild(this._bgLayout);
-        this.addChild(this._gameLayout);
-        this.addChild(this._uiLayout);
-        d = game.ResUtil.createBitmapByName("bg_jpg");
-        this._bgLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page333_png");
-        d.x = 115;
-        d.y = 87;
-        this._gameLayout.addChild(d);
-        d = game.ResUtil.createBitmapByName("page3_pic2_png");
-        d.x = 116;
-        d.y = 240;
-        this._gameLayout.addChild(d);
-        var c = game.ResUtil.createBitmapByName("page3_txt2_png");
-        c.x = 120;
-        c.y = 510;
-        this._gameLayout.addChild(c);
-        d.alpha = 0;
-        c.alpha = 0;
-        egret.Tween.get(d).wait(1E3).to({
-            alpha: 1
-        }, 800);
-        egret.Tween.get(c).wait(1200).to({
-            alpha: 1
-        }, 800)
-    };
-    return f
-}(egret.DisplayObjectContainer);
-Page7.prototype.__class__ = "Page7";
-
+//主函数，整个游戏的入口
 var Main = function (d) {
     function f() {
         d.call(this);
@@ -755,6 +424,7 @@ var Main = function (d) {
         RES.addEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
         RES.loadConfig("resource/resource.json", "resource/")
     };
+    //资源配置文件加载完成
     e.onConfigComplete = function (c) {
         RES.removeEventListener(RES.ResourceEvent.CONFIG_COMPLETE, this.onConfigComplete, this);
         RES.addEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this);
@@ -762,16 +432,26 @@ var Main = function (d) {
         RES.addEventListener(RES.ResourceEvent.GROUP_PROGRESS, this.onResourceProgress, this);
         RES.loadGroup("game")
     };
-    e.onResourceLoadComplete = function (c) {
-        "game" == c.groupName && (this.stage.removeChild(this.loadingView), RES.removeEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this), RES.removeEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this), RES.removeEventListener(RES.ResourceEvent.GROUP_PROGRESS, this.onResourceProgress, this), this.createStage(), this.createGameScene())
-    };
+    //资源加载出错
     e.onResourceLoadError = function (c) {
         console.warn("Group:" + c.groupName + " has failed to load");
         this.onResourceLoadComplete(c)
     };
+    //资源进度
     e.onResourceProgress = function (c) {
         "game" == c.groupName && this.loadingView.setProgress(c.itemsLoaded, c.itemsTotal)
     };
+    //预加载资源加载完成,创建游戏
+    e.onResourceLoadComplete = function (c) {
+        "game" == c.groupName &&
+        (this.stage.removeChild(this.loadingView),
+         RES.removeEventListener(RES.ResourceEvent.GROUP_COMPLETE, this.onResourceLoadComplete, this),
+         RES.removeEventListener(RES.ResourceEvent.GROUP_LOAD_ERROR, this.onResourceLoadError, this),
+         RES.removeEventListener(RES.ResourceEvent.GROUP_PROGRESS, this.onResourceProgress, this),
+         this.createStage(),
+         this.createGameScene());
+    };
+
     e.createStage = function () {
         console.log("ver1.0", egret.MainContext.instance.stage.stageWidth, egret.MainContext.instance.stage.stageHeight);
         this._bgLayout = new egret.DisplayObjectContainer;
@@ -786,22 +466,10 @@ var Main = function (d) {
         //this._uiLayout.addChild(this._touchSp);
         this._touchSp.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchHandler, this);
         this._touchSp.addEventListener(egret.TouchEvent.TOUCH_BEGIN, this.onTouchHandler, this);
-        this._touchSp.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchHandler, this)
+        this._touchSp.addEventListener(egret.TouchEvent.TOUCH_END, this.onTouchHandler, this);
     };
+
     e.createGameScene = function () {
-        /*this._isMoveing = !1;
-         this._pageId = 1;
-         var c = new Page1;
-         c.name = "page1";
-         this._gameLayout.addChild(c);
-         c.alpha = 0;
-         egret.Tween.get(c).to({
-         alpha: 1
-         }, 500);
-         this._arrow = new ArrowBtn;
-         this._arrow.x = egret.MainContext.instance.stage.stageWidth / 2;
-         this._arrow.y = egret.MainContext.instance.stage.stageHeight - 50;
-         this._uiLayout.addChild(this._arrow)*/
         this._isMoveing = false;
         this.enterGameDirectly();
     };
@@ -811,86 +479,11 @@ var Main = function (d) {
         var game = new Game();
         this._gameLayout.addChild(game);
         AppConfig.tracking("game")
-    }
+    };
 
-    e.nextPage = function (c) {
-        var b = this,
-            a = this._gameLayout.getChildByName("page" + String(c - 1)),
-            d = this.getPageById(c);
-        d.name = "page" + c;
-        this._gameLayout.addChild(d);
-        d.y = 1039;
-        egret.Tween.get(a).to({
-            y: -1039
-        }, 800, egret.Ease.quartOut);
-        egret.Tween.get(d).to({
-            y: 0
-        }, 800, egret.Ease.quartOut).call(function (c) {
-            b._isMoveing = !1;
-            b._arrow.visible = !0;
-            b._gameLayout.removeChild(a)
-        }, this);
-        AppConfig.tracking("page" + c)
-    };
-    e.prevPage = function (c) {
-        var b = this,
-            a = this._gameLayout.getChildByName("page" + String(c + 1)),
-            d = this.getPageById(c);
-        d.name = "page" + c;
-        this._gameLayout.addChild(d);
-        d.y = -1039;
-        egret.Tween.get(a).to({
-            y: 1039
-        }, 800, egret.Ease.quartOut);
-        egret.Tween.get(d).to({
-            y: 0
-        }, 800, egret.Ease.quartOut).call(function (c) {
-            b._isMoveing = !1;
-            b._arrow.visible = !0;
-            b._gameLayout.removeChild(a)
-        }, this);
-        AppConfig.tracking("page" + c)
-    };
-    e.gotoGame = function () {
-        var c = this,
-            b = this._gameLayout.getChildByName("page6");
-        egret.Tween.get(b).to({
-            y: -1039
-        }, 500).call(function (a) {
-            c._gameLayout.removeChildren();
-            a = new Game;
-            c._gameLayout.addChild(a)
-        }, this);
-        AppConfig.tracking("game")
-    };
-    e.getPageById = function (c) {
-        var b;
-        switch (c) {
-            case 1:
-                b = new Page1;
-                break;
-            case 2:
-                b = new Page2;
-                break;
-            case 3:
-                b = new Page3;
-                break;
-            case 4:
-                b = new Page4;
-                break;
-            case 5:
-                b = new Page5;
-                break;
-            case 6:
-                b = new Page6;
-                break;
-            case 7:
-                b = new Page7
-        }
-        return b
-    };
-    e.onTouchHandler = function (c) {
-        c.type == egret.TouchEvent.TOUCH_BEGIN ? this._touchY = c.stageY : c.type == egret.TouchEvent.TOUCH_END && (10 < this._touchY - c.stageY && !1 == this._isMoveing ? 6 > this._pageId ? (this._isMoveing = !0, this._arrow.visible = !1, this._pageId += 1, this.nextPage(this._pageId)) : (AppConfig.showDiv(0), console.log("\u51fa\u73b0\u6e38\u620f"), this._arrow.visible = !1, this._touchSp.touchEnabled = !1, this.enterGameDirectly()) : 0 > this._touchY - c.stageY && 10 > this._touchY - c.stageY && !1 == this._isMoveing && 1 < this._pageId && (this._isMoveing = !0, this._arrow.visible = !1, this._pageId -= 1, this.prevPage(this._pageId), AppConfig.showDiv(0)))
+    e.onTouchHandler = function (c)
+    {
+        this.enterGameDirectly();
     };
     return f
 }(egret.DisplayObjectContainer);
